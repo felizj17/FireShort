@@ -13,6 +13,8 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { addLink, setLinks } from "../actions";
 import { getFilteredLinks } from '../selectors';
 import { myFirebase, db } from '../firebase/firebase';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import './components.module.css';
 
 import {
@@ -79,6 +81,8 @@ class Admin extends Component {
       lurl: '',
       curl: '',
       track: true,
+      timed:false,
+      endDate:'',
       locked: false,
       successToast: false,
       viewMode: 'module',
@@ -92,6 +96,8 @@ class Admin extends Component {
     this.handleTrackChange = this.handleTrackChange.bind(this);
     this.handleProtectChange = this.handleProtectChange.bind(this);
     this.handlePswChange = this.handlePswChange.bind(this);
+    this.handleDateChange = this.handleDateChange.bind(this);
+    this.handleTimedChange = this.handleTimedChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -106,7 +112,10 @@ class Admin extends Component {
   handleTrackChange = (event) => {
     this.setState({ track: !this.state.track });
   };
-
+  handleTimedChange = (event) => {
+    console.log(event,'toggle timed');
+    this.setState({timed: !this.state.timed});
+  };
   handleProtectChange = (event) => {
     console.log(event, 'toggle protect')
     this.setState({ locked: !this.state.locked });
@@ -115,7 +124,9 @@ class Admin extends Component {
   handlePswChange = ({target}) => {
     this.setState({ newPsw: target.value})
   }
-
+  handleDateChange =({target}) => {
+    this.setState({endDate: target.value})
+  }
   createLink = (curl, data) => {
     const self = this;
     db.collection('shorturls')
@@ -484,6 +495,8 @@ class Admin extends Component {
             handleCurlChange={this.handleCurlChange}
             handleSubmit={this.handleSubmit}
             handleTrackChange={this.handleTrackChange}
+            handleTimedChange={this.handleTimedChange}
+            handleDateChange={this.handleDateChange}
             handleProtectChange={this.handleProtectChange}
             handlePswChange={this.handlePswChange}
           />

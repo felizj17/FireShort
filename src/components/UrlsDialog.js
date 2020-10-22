@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Switch from '@material-ui/core/Switch';
 import Grid from '@material-ui/core/Grid';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
+import DatePicker from 'react-datepicker';
+import addDays from 'date-fns/addDays'
+import "react-datepicker/dist/react-datepicker.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@material-ui/core';
-
 const AntSwitch = withStyles((theme) => ({
     root: {
         width: 28,
@@ -50,13 +53,13 @@ function hasSpaces(s) {
     console.log(regexp.test(s))
     return regexp.test(s);
 }
-
+ 
 export default function UrlsDialog(props) {
     const [open, setOpen] = React.useState(false);
     const handleClick = () => {
         setOpen(true);
     };
-
+   
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -119,6 +122,8 @@ export default function UrlsDialog(props) {
                     value={props.state.curl}
                     onChange={props.handleCurlChange}
                 />
+                
+                
                 <Grid
                     component="label"
                     container
@@ -134,6 +139,42 @@ export default function UrlsDialog(props) {
                             onChange={props.handleTrackChange} name="checked"
                         />
                     </Grid>
+                    {/*<Grid item>On</Grid>*/}
+                </Grid>
+                <Grid
+                    component="label"
+                    container
+                    alignItems="center"
+                    spacing={1}
+                    style={{marginBottom: "15px" }}
+                >
+                    <Grid item><b>Link Expiration</b></Grid>
+                    {/*<Grid item>Off</Grid>*/}
+                    <Grid item>
+                        <AntSwitch
+                            timer={props.state.timed}
+                            onChange={props.handleTimedChange} name="timer"
+                        />
+                    </Grid>
+                    {
+                        props.state.timed ?
+                        <Grid item style={{ marginLeft: "15px", padding: "0px"}}>
+                            <DatePicker
+                                //selected={ this.state.startDate }
+                                //onChange={ this.handleChange }
+                                showTimeSelect
+                                timeFormat="HH:mm"
+                                timeIntervals={20}
+                                timeCaption="time"
+                                dateFormat="MMMM d, yyyy h:mm aa"
+                                minDate={new Date()}
+                                maxDate={addDays(new Date(), 7)}
+                                value={props.state.endDate}
+                                onChange={props.handleDateChange}
+                            />
+                        </Grid>
+                        : null
+                    }
                     {/*<Grid item>On</Grid>*/}
                 </Grid>
                 <Grid
