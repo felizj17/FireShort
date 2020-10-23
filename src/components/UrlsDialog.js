@@ -67,6 +67,7 @@ export default function UrlsDialog(props) {
 
         setOpen(false);
     };
+   
     return (
         <Dialog
             open={props.state.formopen}
@@ -122,7 +123,19 @@ export default function UrlsDialog(props) {
                     value={props.state.curl}
                     onChange={props.handleCurlChange}
                 />
-                
+                 <form onSubmit={props.onFormSubmit}>
+                    <div className="form-group">
+                        <DatePicker                                         
+                            selected={ props.state.endDate }                                               
+                            dateFormat="MMMM d, yyyy"
+                            minDate={new Date()}
+                            maxDate={addDays(new Date(), 21)}
+                            value={props.state.endDate} 
+                            isClearable
+                            onChange={props.handleDateChange}
+                        />
+                    </div>
+                 </form>
                 
                 <Grid
                     component="label"
@@ -141,42 +154,7 @@ export default function UrlsDialog(props) {
                     </Grid>
                     {/*<Grid item>On</Grid>*/}
                 </Grid>
-                <Grid
-                    component="label"
-                    container
-                    alignItems="center"
-                    spacing={1}
-                    style={{marginBottom: "15px" }}
-                >
-                    <Grid item><b>Link Expiration</b></Grid>
-                    {/*<Grid item>Off</Grid>*/}
-                    <Grid item>
-                        <AntSwitch
-                            timer={props.state.timed}
-                            onChange={props.handleTimedChange} name="timer"
-                        />
-                    </Grid>
-                    {
-                        props.state.timed ?
-                        <Grid item style={{ marginLeft: "15px", padding: "0px"}}>
-                            <DatePicker
-                                //selected={ this.state.startDate }
-                                //onChange={ this.handleChange }
-                                showTimeSelect
-                                timeFormat="HH:mm"
-                                timeIntervals={20}
-                                timeCaption="time"
-                                dateFormat="MMMM d, yyyy h:mm aa"
-                                minDate={new Date()}
-                                maxDate={addDays(new Date(), 7)}
-                                value={props.state.endDate}
-                                onChange={props.handleDateChange}
-                            />
-                        </Grid>
-                        : null
-                    }
-                    {/*<Grid item>On</Grid>*/}
-                </Grid>
+                
                 <Grid
                     component="label"
                     container

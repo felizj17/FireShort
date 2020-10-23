@@ -13,8 +13,6 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { addLink, setLinks } from "../actions";
 import { getFilteredLinks } from '../selectors';
 import { myFirebase, db } from '../firebase/firebase';
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import './components.module.css';
 
 import {
@@ -82,7 +80,7 @@ class Admin extends Component {
       curl: '',
       track: true,
       timed:false,
-      endDate:'',
+      endDate:new Date(),
       locked: false,
       successToast: false,
       viewMode: 'module',
@@ -97,7 +95,7 @@ class Admin extends Component {
     this.handleProtectChange = this.handleProtectChange.bind(this);
     this.handlePswChange = this.handlePswChange.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
-    this.handleTimedChange = this.handleTimedChange.bind(this);
+    this.onFormSubmit = this.onFormSubmit.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -112,10 +110,8 @@ class Admin extends Component {
   handleTrackChange = (event) => {
     this.setState({ track: !this.state.track });
   };
-  handleTimedChange = (event) => {
-    console.log(event,'toggle timed');
-    this.setState({timed: !this.state.timed});
-  };
+
+    
   handleProtectChange = (event) => {
     console.log(event, 'toggle protect')
     this.setState({ locked: !this.state.locked });
@@ -123,10 +119,18 @@ class Admin extends Component {
 
   handlePswChange = ({target}) => {
     this.setState({ newPsw: target.value})
-  }
-  handleDateChange =({target}) => {
-    this.setState({endDate: target.value})
-  }
+  };
+  handleDateChange = ({date}) => {
+    if(this.state.endDate == ''){
+      this.setState({timed: false});
+    }else{
+    this.setState({ endDate:date })
+    }
+  };
+  onFormSubmit(e) {
+    e.preventDefault();
+    console.log(this.state.endDate)
+  };
   createLink = (curl, data) => {
     const self = this;
     db.collection('shorturls')
@@ -138,7 +142,7 @@ class Admin extends Component {
   };
 
   handleSubmit = (event) => {
-    let {lurl, curl, track, locked, newPsw} = this.state
+    let {lurl, curl, track, locked, newPsw, timed, endDate} = this.state
     const self = this;
     if (curl === '') {
       curl = nanoid(8);
@@ -147,6 +151,8 @@ class Admin extends Component {
       lurl: lurl,
       curl: curl,
       track: track,
+      timed:timed,
+      endDate:timed ? endDate:'',
       locked: locked,
       password: locked ? newPsw : '',
       hits: 0,
@@ -255,6 +261,8 @@ class Admin extends Component {
             curl: data.curl,
             track: data.track,
             locked: data.locked,
+            timed:data.timed,
+            endDate:data.endDate,
             newPsw: data.password,
             backdrop: false,
             formopen: true
