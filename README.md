@@ -10,8 +10,6 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
 ![Stars](https://img.shields.io/github/stars/monizb/FireShort)
 
-`Accepting Hacktoberfest Contributions`
-
 Fireshort is a URL shortener made using Google Firestore and React.JS The
 original repository has been forked from
 [here](https://github.com/xprilion/fireshort)
@@ -34,11 +32,11 @@ The following features are under development/open for contributions.Please first
 create a feature issue to discuss about the feature you would like to take up.
 
 - [x] Multiple Admin Panels and New User Registration
-- [ ] Ability to check for Custom URL clashes across all users instantly to
+- [x] Ability to check for Custom URL clashes across all users instantly to
       verify if it has been taken already
-- [ ] Make a page for link analytics , with number of clicks,and all the
+- [x] Make a page for link analytics , with number of clicks,and all the
       activity related to it
-- [ ] Add a lot more Analytics options with different types of charts
+- [x] Add a lot more Analytics options with different types of charts
 - [ ] Show a Dialog box with the created link wth different sharing option and a
       way to show QR Codes (and a way to track every qr scan) for the same
 - [ ] Add a homepage showcasing the tool with animations
