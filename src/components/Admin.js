@@ -13,6 +13,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { addLink, setLinks } from "../actions";
 import { getFilteredLinks } from '../selectors';
 import { myFirebase, db } from '../firebase/firebase';
+
 import './components.module.css';
 
 import {
@@ -81,6 +82,9 @@ class Admin extends Component {
       //expiryDate: new Date(),
       track: true,
       locked: false,
+      expiryDateDisplay:'',
+      expires:false,
+      expiryDate:'',
       successToast: false,
       viewMode: 'module',
       backdrop: false,
@@ -88,6 +92,7 @@ class Admin extends Component {
       newPsw: '',
       currUrl: null,
     };
+    this.handleDateChange = this.handleDateChange.bind(this);
     this.handleLurlChange = this.handleLurlChange.bind(this);
     this.handleCurlChange = this.handleCurlChange.bind(this);
     this.handleTrackChange = this.handleTrackChange.bind(this);
@@ -115,7 +120,20 @@ class Admin extends Component {
   handlePswChange = ({target}) => {
     this.setState({ newPsw: target.value})
   }
+  handleDateChange =(date)=>{
+    let expiryDateDisp;
+    let exp = true;
+    let time = new Date(date).getTime()
+    if(time > 0 ){
+      expiryDateDisp = new Date(date).toISOString().split('T')[0];
+      exp = true;
+    }else{
+      expiryDateDisp='';
+      exp = false;
+    }
+    this.setState({expiryDate: time, expires: exp, expiryDateDisplay: expiryDateDisp});
 
+  };
   createLink = (curl, data) => {
     const self = this;
     db.collection('shorturls')
@@ -127,15 +145,23 @@ class Admin extends Component {
   };
 
   handleSubmit = (event) => {
-    let {lurl, curl, track, locked, newPsw} = this.state
+    let {lurl, curl, expiryDate, expiryDateDisplay, expires, track, locked, newPsw} = this.state
+    let time;
     const self = this;
     if (curl === '') {
-      curl = nanoid(8);
+      curl = nanoid(8);  
+    };     
+    if(self.state.expires === false){
+      time = null;
+    }else{
+     time = expiryDate;
     }
     let data = {
       lurl: lurl,
       curl: curl,
-      //expiryDate: expiryDate,
+      expires:expires,
+      expiryDateDisplay:expiryDateDisplay,
+      expiryDate: time,
       track: track,
       locked: locked,
       password: locked ? newPsw : '',
@@ -184,7 +210,6 @@ class Admin extends Component {
           self.updateUrls();
         }
       });
-
     self.handleClose();
   };
 
@@ -237,22 +262,28 @@ class Admin extends Component {
       .then((doc) => {
         if (!doc.exists) {
           console.log('No such document!');
-        } 
-        else {
-              var data = doc.data();
-              // reduce number of calls to setState
-              self.setState({
-                lurl: data.lurl,
-                curl: data.curl,
-                //expiryDate: data.expiryDate,
-                track: data.track,
-                locked: data.locked,
-                newPsw: data.password,
-                backdrop: false,
-                formopen: true
-              });
-            }
-          })
+        } else {
+          var data = doc.data();
+          if(data.expires === false){
+            self.setState({expiryDate: null})
+            console.log(data.expiryDate)
+          }else{
+            self.setState({expiryDate: new Date(data.expiryDate)})
+          }
+          // reduce number of calls to setState
+          self.setState({
+            lurl: data.lurl,
+            curl: data.curl,
+            expiryDateDisplay:data.expiryDateDisplay,
+            expires: data.expires,
+            track: data.track,
+            locked: data.locked,
+            newPsw: data.password,
+            backdrop: false,
+            formopen: true
+          });
+        }
+      })
       .catch((err) => {
         console.log('Error getting document', err);
       });
@@ -261,7 +292,7 @@ class Admin extends Component {
   handleClickOpen = () => {
     this.setState({ formopen: true });
     this.setState({
-      lurl: '', curl: '', newPsw: '', locked: false
+      lurl: '', curl: '', expiryDate:'', newPsw: '', locked: false
     });
   };
 
@@ -343,7 +374,7 @@ class Admin extends Component {
     db.collection('settings').doc(this.props.user.uid).set({ viewMode: mode });
   };
 
-  componentDidMount() {
+  componentDidMount(){
     const self = this;
     myFirebase.auth().onAuthStateChanged(function (user) {
       if (user) {
@@ -456,7 +487,7 @@ class Admin extends Component {
               <>                            
                   {this.state.loading == false &&                      
                     <Container maxWidth='md'>
-                      <img src={'/Images/pixeltrue-search.svg'} style={{margin: "30px auto", display: "block", width: "100%", maxHeight: "400px" }} />
+                      <img src={'/Images/pixeltrue-search.svg'} alt={'Add links to get started!'} style={{margin: "30px auto", display: "block", width: "100%", maxHeight: "400px" }} />
                       <Card className={classes.toolBarRoot} style={{marginBottom: "30px"}}>
                         <Typography align="center" style={{padding: "30px 60px"}} variant="h6">
                           Oops! Looks like you don't have any links. Press the "+" icon below to start adding links.
@@ -483,6 +514,7 @@ class Admin extends Component {
           <UrlsDialog
             state={this.state}
             handleClose={this.handleClose}
+            handleDateChange={this.handleDateChange}
             handleExpiryChange={this.handleExpiryChange}
             handleLurlChange={this.handleLurlChange}
             handleCurlChange={this.handleCurlChange}
