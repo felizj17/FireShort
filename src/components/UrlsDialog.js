@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useReducer } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Switch from '@material-ui/core/Switch';
 import Grid from '@material-ui/core/Grid';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 import DatePicker from 'react-datepicker';
-import addDays from 'date-fns/addDays'
+
 import "react-datepicker/dist/react-datepicker.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@material-ui/core';
@@ -55,11 +55,13 @@ function hasSpaces(s) {
 }
  
 export default function UrlsDialog(props) {
+    const [expiryDate, setExpiryDate] = useState(new Date());
     const [open, setOpen] = React.useState(false);
     const handleClick = () => {
         setOpen(true);
     };
-   
+
+    
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -67,7 +69,25 @@ export default function UrlsDialog(props) {
 
         setOpen(false);
     };
-   
+    /*const linkExpired = () =>{
+        const timeClicked = new Date(new Date().getTime() + 60 * 60 * 24 * 1000);
+        if(expiryDate>timeClicked ){
+          console.log("open the link")
+        }
+        else{
+          confirmAlert({
+            title: 'Link has Expired!',
+            message:
+              'The Custom URL link you are trying to access expired at :' + props.endDate,
+            buttons: [
+              {
+                label: 'Ok'
+              },
+            ],
+          });
+        }
+    
+      };*/
     return (
         <Dialog
             open={props.state.formopen}
@@ -123,20 +143,16 @@ export default function UrlsDialog(props) {
                     value={props.state.curl}
                     onChange={props.handleCurlChange}
                 />
-                 <form onSubmit={props.onFormSubmit}>
-                    <div className="form-group">
-                        <DatePicker                                         
-                            selected={ props.state.endDate }                                               
-                            dateFormat="MMMM d, yyyy"
-                            minDate={new Date()}
-                            maxDate={addDays(new Date(), 21)}
-                            value={props.state.endDate} 
-                            isClearable
-                            onChange={props.handleDateChange}
-                        />
-                    </div>
-                 </form>
-                
+                <DatePicker 
+                    selected={expiryDate} 
+                    onChange={date=>setExpiryDate(date)}
+                    isClearable
+                    minDate={new Date()}
+                    timeInputLabel="Time:"
+                    dateFormat="MM/dd/yyyy h:mm aa"
+                    showTimeInput
+                    placeholderText="No Expiration!"                         
+                />               
                 <Grid
                     component="label"
                     container

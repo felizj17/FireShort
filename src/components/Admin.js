@@ -78,9 +78,8 @@ class Admin extends Component {
       hitsopen: false,
       lurl: '',
       curl: '',
+      //expiryDate: new Date(),
       track: true,
-      timed:false,
-      endDate:new Date(),
       locked: false,
       successToast: false,
       viewMode: 'module',
@@ -94,15 +93,12 @@ class Admin extends Component {
     this.handleTrackChange = this.handleTrackChange.bind(this);
     this.handleProtectChange = this.handleProtectChange.bind(this);
     this.handlePswChange = this.handlePswChange.bind(this);
-    this.handleDateChange = this.handleDateChange.bind(this);
-    this.onFormSubmit = this.onFormSubmit.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleLurlChange = (event) => {
     this.setState({ lurl: event.target.value });
   };
-
   handleCurlChange = (event) => {
     this.setState({ curl: event.target.value });
   };
@@ -111,7 +107,6 @@ class Admin extends Component {
     this.setState({ track: !this.state.track });
   };
 
-    
   handleProtectChange = (event) => {
     console.log(event, 'toggle protect')
     this.setState({ locked: !this.state.locked });
@@ -119,18 +114,8 @@ class Admin extends Component {
 
   handlePswChange = ({target}) => {
     this.setState({ newPsw: target.value})
-  };
-  handleDateChange = ({date}) => {
-    if(this.state.endDate == ''){
-      this.setState({timed: false});
-    }else{
-    this.setState({ endDate:date })
-    }
-  };
-  onFormSubmit(e) {
-    e.preventDefault();
-    console.log(this.state.endDate)
-  };
+  }
+
   createLink = (curl, data) => {
     const self = this;
     db.collection('shorturls')
@@ -142,7 +127,7 @@ class Admin extends Component {
   };
 
   handleSubmit = (event) => {
-    let {lurl, curl, track, locked, newPsw, timed, endDate} = this.state
+    let {lurl, curl, track, locked, newPsw} = this.state
     const self = this;
     if (curl === '') {
       curl = nanoid(8);
@@ -150,9 +135,8 @@ class Admin extends Component {
     let data = {
       lurl: lurl,
       curl: curl,
+      //expiryDate: expiryDate,
       track: track,
-      timed:timed,
-      endDate:timed ? endDate:'',
       locked: locked,
       password: locked ? newPsw : '',
       hits: 0,
@@ -243,7 +227,7 @@ class Admin extends Component {
       ]
     });
   }
-
+  
   handleEditShortUrl = (curl) => {
     this.setState({ backdrop: true });
     const self = this;
@@ -253,22 +237,22 @@ class Admin extends Component {
       .then((doc) => {
         if (!doc.exists) {
           console.log('No such document!');
-        } else {
-          var data = doc.data();
-          // reduce number of calls to setState
-          self.setState({
-            lurl: data.lurl,
-            curl: data.curl,
-            track: data.track,
-            locked: data.locked,
-            timed:data.timed,
-            endDate:data.endDate,
-            newPsw: data.password,
-            backdrop: false,
-            formopen: true
-          });
-        }
-      })
+        } 
+        else {
+              var data = doc.data();
+              // reduce number of calls to setState
+              self.setState({
+                lurl: data.lurl,
+                curl: data.curl,
+                //expiryDate: data.expiryDate,
+                track: data.track,
+                locked: data.locked,
+                newPsw: data.password,
+                backdrop: false,
+                formopen: true
+              });
+            }
+          })
       .catch((err) => {
         console.log('Error getting document', err);
       });
@@ -499,12 +483,11 @@ class Admin extends Component {
           <UrlsDialog
             state={this.state}
             handleClose={this.handleClose}
+            handleExpiryChange={this.handleExpiryChange}
             handleLurlChange={this.handleLurlChange}
             handleCurlChange={this.handleCurlChange}
             handleSubmit={this.handleSubmit}
             handleTrackChange={this.handleTrackChange}
-            handleTimedChange={this.handleTimedChange}
-            handleDateChange={this.handleDateChange}
             handleProtectChange={this.handleProtectChange}
             handlePswChange={this.handlePswChange}
           />
